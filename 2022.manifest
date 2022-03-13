@@ -3,7 +3,12 @@
     <Metadata>
         <Identity Id="4dc98cb4-3bc2-4144-a18b-ef520fb8ffa3" Version="1.0" Language="en-US" Publisher="Raul Ramos" />
         <DisplayName>RunCommandOnSave</DisplayName>
-        <Description xml:space="preserve">Run commands on pre/post save events</Description>
+        <Description xml:space="preserve">Run commands on save events: pre and post</Description>
+        <MoreInfo>http://github.com/galtza/RunCommandOnSave/README.md</MoreInfo>
+        <License>LICENSE</License>
+        <GettingStartedGuide>http://github.com/galtza/RunCommandOnSave/README.md</GettingStartedGuide>
+        <Icon>Resources\Icon.png</Icon>
+        <Tags>command run format save</Tags>
     </Metadata>
     <Installation>
         <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0,)">

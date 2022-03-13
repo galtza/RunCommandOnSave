@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Linq;
 using Microsoft.VisualStudio.Shell;
 
-namespace RunOnSave
+namespace RunCommandOnSave
 {
     public class Settings
     {
@@ -95,11 +95,11 @@ namespace RunOnSave
 
         private string LocateSettings(string startingPath)
         {
-            var cfgFile = new FileInfo(Path.Combine(startingPath, ".runonsave"));
+            var cfgFile = new FileInfo(Path.Combine(startingPath, ".runcommandonsave"));
             var dir = new DirectoryInfo(startingPath);
             while (!cfgFile.Exists && dir.Parent != null)
             {
-                var configs = dir.GetFiles(".runonsave");
+                var configs = dir.GetFiles(".runcommandonsave");
                 if (configs.Length > 0)
                 {
                     cfgFile = configs[0];

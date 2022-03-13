@@ -1,15 +1,12 @@
-# RunOnSave
+# RunCommandOnSave
 
 Visual Studio Extension (VSIX) that allows to run any command as you save files (Pre/Post save).
-
-### Install
-Double click the the *RunOnSave.vsix* file and follow the installation instructions.
 
 ### Targets
 At the moment, it only supports VS2019, however VS2022 is in the roadmap.
 
 ### Configure
-A `.runonsave` file is a directory-level configuration file with INI format. All the documents in the folder and subfolders will abide by the configuration. We can override **the whole file** by creating another `.runonsave` file in a subfolder.
+A `.runcommandonsave` file is a directory-level configuration file with INI format. All the documents in the folder and subfolders will abide by the configuration. We can override **the whole file** by creating another `.runonsave` file in a subfolder.
 
 It can contain 3 possible sections: `[PreSave]`, `[PostSave]` or `[Debug]` like in this example. The debug section only allows to activate it with the key `On`. The other two, allow to specify the commands we want to execute, the excluded extensions (none by default) and the excluded paths (none by default too).
 
@@ -21,7 +18,7 @@ On = true
 
 [PreSave]
 Commands=Edit.FormatDocument|OtherCommand
-ExcludeExtensions=.xml|.clang-format|.runonsave
+ExcludeExtensions=.xml|.clang-format|.runcommandonsave
 ExcludePaths=third-party|research
 
 [PostSave]

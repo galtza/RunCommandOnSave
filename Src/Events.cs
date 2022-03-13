@@ -8,7 +8,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace RunOnSave
+namespace RunCommandOnSave
 {
     internal class Events : IVsRunningDocTableEvents3
     {
@@ -88,11 +88,11 @@ namespace RunOnSave
                     {
                         if (Commands == null || Commands.Length == 0 || NumErrors > 0)
                         {
-                            Log(String.Format("{0}: RunOnSave/{1} was NOT processed\n", DocumentToFormat.FullName, section));
+                            Log(String.Format("{0}: RunCommandOnSave/{1} was NOT processed\n", DocumentToFormat.FullName, section));
                         }
                         else
                         {
-                            Log(String.Format("{0}: RunOnSave/{1} WAS processed\n", DocumentToFormat.FullName, section));
+                            Log(String.Format("{0}: RunCommandOnSave/{1} WAS processed\n", DocumentToFormat.FullName, section));
                         }
                     }
                 }

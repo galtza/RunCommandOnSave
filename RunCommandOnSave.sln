@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RunOnSave", "RunOnSave.csproj", "{3F4B9256-4283-4CA9-935B-FFFF7CC42974}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RunCommandOnSave", "RunCommandOnSave.csproj", "{3F4B9256-4283-4CA9-935B-FFFF7CC42974}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

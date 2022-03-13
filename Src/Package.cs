@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using EnvDTE;
 
-namespace RunOnSave
+namespace RunCommandOnSave
 {
     [PackageRegistration(UseManagedResourcesOnly = false, AllowsBackgroundLoading = true, RegisterUsing = RegistrationMethod.Assembly)]
     [ProvideAutoLoad(UIContextGuids80.NoSolution, PackageAutoLoadFlags.BackgroundLoad)]

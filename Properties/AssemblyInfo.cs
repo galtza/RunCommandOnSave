@@ -1,12 +1,12 @@
-﻿using RunOnSave;
+﻿using RunCommandOnSave;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("RunOnSave")]
-[assembly: AssemblyDescription("Run commands on pre/post events")]
+[assembly: AssemblyTitle("RunCommandOnSave")]
+[assembly: AssemblyDescription("Run commands on save events: pre and post")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Raul Ramos")]
-[assembly: AssemblyProduct("RunOnSave")]
+[assembly: AssemblyProduct("RunCommandOnSave")]
 [assembly: AssemblyCopyright("Raul Ramos")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

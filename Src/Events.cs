@@ -54,52 +54,44 @@ namespace RunCommandOnSave
 
         private void Process(uint docCookie, string section)
         {
-            try
+            ThreadHelper.ThrowIfNotOnUIThread();
+            var Documents = _dte.Documents.Cast<Document>();
+            var DocumentToFormat = CookieToDoc(docCookie, Documents);
+            if (DocumentToFormat != null)
             {
-                ThreadHelper.ThrowIfNotOnUIThread();
-                var Documents = _dte.Documents.Cast<Document>();
-                var DocumentToFormat = CookieToDoc(docCookie, Documents);
-                if (DocumentToFormat != null)
+                var FileSettings = new Settings(DocumentToFormat.FullName);
+                var Commands = FileSettings.GetCommand(DocumentToFormat.FullName, section);
+                var NumErrors = 0;
+                if (Commands != null && _dte.ActiveWindow.Kind == "Document")
                 {
-
-                    var FileSettings = new Settings(DocumentToFormat.FullName);
-                    var Commands = FileSettings.GetCommand(DocumentToFormat.FullName, section);
-                    var NumErrors = 0;
-                    if (Commands != null && _dte.ActiveWindow.Kind == "Document")
+                    var ActiveDocument = _dte.ActiveDocument;
+                    DocumentToFormat.Activate();
+                    foreach (string Cmd in Commands)
                     {
-                        var ActiveDocument = _dte.ActiveDocument;
-                        DocumentToFormat.Activate();
-                        foreach (string Cmd in Commands)
+                        try
                         {
-                            try
-                            {
-                                _dte.ExecuteCommand(Cmd, string.Empty);
-                            }
-                            catch (Exception)
-                            {
-                                NumErrors += 1;
-                            }
+                            _dte.ExecuteCommand(Cmd, string.Empty);
                         }
-                        ActiveDocument.Activate();
+                        catch (Exception)
+                        {
+                            NumErrors += 1;
+                        }
                     }
+                    ActiveDocument.Activate();
+                }
 
-                    var Debug = FileSettings.ReadKey("Debug", "On");
-                    if (Debug != null && Debug.Equals("True", StringComparison.OrdinalIgnoreCase))
+                var Debug = FileSettings.ReadKey("Debug", "On");
+                if (Debug != null && Debug.Equals("True", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (Commands == null || Commands.Length == 0 || NumErrors > 0)
                     {
-                        if (Commands == null || Commands.Length == 0 || NumErrors > 0)
-                        {
-                            Log(String.Format("{0}: RunCommandOnSave/{1} was NOT processed\n", DocumentToFormat.FullName, section));
-                        }
-                        else
-                        {
-                            Log(String.Format("{0}: RunCommandOnSave/{1} WAS processed\n", DocumentToFormat.FullName, section));
-                        }
+                        Log(String.Format("{0}: RunCommandOnSave/{1} was NOT processed\n", DocumentToFormat.FullName, section));
+                    }
+                    else
+                    {
+                        Log(String.Format("{0}: RunCommandOnSave/{1} WAS processed\n", DocumentToFormat.FullName, section));
                     }
                 }
-            }
-            finally
-            {
-
             }
         }
 

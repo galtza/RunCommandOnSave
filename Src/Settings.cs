@@ -48,7 +48,7 @@ namespace RunCommandOnSave
                 var ExcludedPaths = ExcludedPathsRawList.Select(s => new FileInfo(Path.Combine(BasePath, s.Replace("/", "\\").Replace("\"", ""))).FullName);
                 try
                 {
-                    foreach (string Path in ExcludedPaths)
+                    foreach (var Path in ExcludedPaths)
                     {
                         if (docFullName.StartsWith(Path))
                         {
@@ -69,7 +69,7 @@ namespace RunCommandOnSave
                 var ExcludedExtensions = ExcludedExtensionsRaw.Split(new char[] { '|' }, System.StringSplitOptions.RemoveEmptyEntries).Select(s => s.TrimSuffix("*"));
                 try
                 {
-                    foreach (string Ext in ExcludedExtensions)
+                    foreach (var Ext in ExcludedExtensions)
                     {
                         if (docFullName.EndsWith(Ext))
                         {

@@ -3,7 +3,7 @@
 Visual Studio Extension (VSIX) that allows to run any command as you save files (Pre/Post save).
 
 ### Targets
-At the moment, it only supports VS2019, however VS2022 is in the roadmap.
+It only supports VS2019 and VS2022.
 
 ### Configure
 A `.runcommandonsave` file is a directory-level configuration file with INI format. All the documents in the folder and subfolders will abide by the configuration. We can override **the whole file** by creating another `.runonsave` file in a subfolder.

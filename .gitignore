@@ -32,3 +32,6 @@
 *.app
 .tmp/
 .vs/
+*.user
+bin/
+obj/

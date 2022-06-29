@@ -14,6 +14,7 @@ namespace RunCommandOnSave
     {
         private readonly DTE _dte;
         private readonly RunningDocumentTable _runningDocumentTable;
+        private OutputWindowPane _pane;
 
         public Events(DTE dte, RunningDocumentTable runningDocumentTable)
         {
@@ -101,8 +102,25 @@ namespace RunCommandOnSave
             var dte2 = _dte as DTE2;
             if (dte2 != null)
             {
-                dte2.ToolWindows.OutputWindow.ActivePane.OutputString(message);
-            }
+                var panes = dte2.ToolWindows.OutputWindow.OutputWindowPanes;
+                try
+                {
+                   _pane = panes.Item("Run Command On Save");
+                }
+                catch (ArgumentException)
+                {
+                }
+
+                if (_pane == null)
+                {
+                    _pane = panes.Add("Run Command On Save");
+                }
+
+                if (_pane != null)
+                {
+                    _pane.OutputString(message);
+                }
+            }            
         }
 
         private Document CookieToDoc(uint docCookie, IEnumerable<Document> documents)

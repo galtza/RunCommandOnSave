@@ -15,11 +15,10 @@ namespace RunCommandOnSave
     {
         protected override async System.Threading.Tasks.Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            await JoinableTaskFactory.SwitchToMainThreadAsync();
+            await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
             var runningDocumentTable = new RunningDocumentTable(this);
             runningDocumentTable.Advise(new Events(await this.GetServiceAsync(typeof(DTE)) as DTE, runningDocumentTable));
             await this.RegisterCommandsAsync();
         }
-
     }
 }

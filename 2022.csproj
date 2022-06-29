@@ -1,20 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-
   <PropertyGroup>
     <BaseOutputPath>.out</BaseOutputPath>
     <BaseIntermediateOutputPath>.tmp</BaseIntermediateOutputPath>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
-
   <PropertyGroup>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
     <LangVersion>9.0</LangVersion>
   </PropertyGroup>
-
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
-
   <PropertyGroup>
     <OutputPath>.out\2022\$(Configuration)\</OutputPath>
     <LangVersion>9.0</LangVersion>
@@ -23,19 +21,16 @@
     <IntermediateOutputPath>.tmp\2022\$(Configuration)\</IntermediateOutputPath>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
     <DefineConstants>DEBUG</DefineConstants>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
   </PropertyGroup>
-
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
   </PropertyGroup>
-
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <SchemaVersion>2.0</SchemaVersion>
@@ -45,7 +40,6 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>RunCommandOnSave</RootNamespace>
     <AssemblyName>RunCommandOnSave</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <GeneratePkgDefFile>true</GeneratePkgDefFile>
     <UseCodebase>true</UseCodebase>
     <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
@@ -73,15 +67,13 @@
     </Content>
     <None Include="source.extension.vsixmanifest" />
   </ItemGroup>
-
   <ItemGroup>
     <Reference Include="System" />
     <PackageReference Include="Community.VisualStudio.Toolkit.17" Version="17.0.451" ExcludeAssets="Runtime" />
+    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.2.32505.173" ExcludeAssets="Runtime" />
   </ItemGroup>
-
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
-
   <PropertyGroup>
     <PreBuildEvent>
 rmdir $(ProjectDir)\tmp /Q /S 2&gt; NUL

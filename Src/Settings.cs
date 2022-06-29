@@ -11,17 +11,13 @@ namespace RunCommandOnSave
     {
         public Settings(string docFullName)
         {
-            SettingsFilename = LocateSettings(Path.GetDirectoryName(docFullName));
-            if (SettingsFilename == null)
-            {
-                throw new ArgumentException("No Settings found for this file", docFullName);
-            }
+            _settingsFilename = LocateSettings(Path.GetDirectoryName(docFullName));
         }
 
         public string ReadKey(string section, string key)
         {
             var Temp = new StringBuilder(256);
-            var NumberOfChars = GetPrivateProfileString(section, key, null, Temp, Temp.Capacity, SettingsFilename);
+            var NumberOfChars = GetPrivateProfileString(section, key, null, Temp, Temp.Capacity, _settingsFilename);
             return NumberOfChars == 0 ? null : Temp.ToString();
         }
 
@@ -43,7 +39,7 @@ namespace RunCommandOnSave
             var ExcludedPathsRaw = ReadKey(action, "ExcludePaths");
             if (ExcludedPathsRaw != null)
             {
-                var BasePath = Path.GetDirectoryName(SettingsFilename);
+                var BasePath = Path.GetDirectoryName(_settingsFilename);
                 var ExcludedPathsRawList = ExcludedPathsRaw.Split(new char[] { '|' }, System.StringSplitOptions.RemoveEmptyEntries);
                 var ExcludedPaths = ExcludedPathsRawList.Select(s => new FileInfo(Path.Combine(BasePath, s.Replace("/", "\\").Replace("\"", ""))).FullName);
                 try
@@ -91,7 +87,7 @@ namespace RunCommandOnSave
             ===============
         */
 
-        private string SettingsFilename = null;
+        private string _settingsFilename = null;
 
         private string LocateSettings(string startingPath)
         {

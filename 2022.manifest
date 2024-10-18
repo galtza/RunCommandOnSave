@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="bab99f08-ef43-4892-bd4a-8d5970d2c83c" Version="1.1.0" Language="en-US" Publisher="Raul Ramos" />
+        <Identity Id="ddda52d3-04d2-4ddc-bc4f-37b1d542719a" Version="1.1.0" Language="en-US" Publisher="Raul Ramos" />
         <DisplayName>Run Command On Save</DisplayName>
         <Description xml:space="preserve">Run any command before and after saving a file</Description>
         <MoreInfo>https://github.com/galtza/RunCommandOnSave/#readme</MoreInfo>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="bab99f08-ef43-4892-bd4a-8d5970d2c83c" Version="1.0" Language="en-US" Publisher="Raul Ramos" />
+        <Identity Id="bab99f08-ef43-4892-bd4a-8d5970d2c83c" Version="1.1.0" Language="en-US" Publisher="Raul Ramos" />
         <DisplayName>Run Command On Save</DisplayName>
         <Description xml:space="preserve">Run any command before and after saving a file</Description>
         <MoreInfo>https://github.com/galtza/RunCommandOnSave/#readme</MoreInfo>
@@ -15,6 +15,9 @@
             <ProductArchitecture>amd64</ProductArchitecture>
         </InstallationTarget>
     </Installation>
+    <Assets>
+        <Asset Type="Microsoft.VisualStudio.VsPackage" Path="RunCommandOnSave.pkgdef" />
+    </Assets>
     <Prerequisites>
         <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[12.0,18.0)" DisplayName="Visual Studio core editor" />
     </Prerequisites>

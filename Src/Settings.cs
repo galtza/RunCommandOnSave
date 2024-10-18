@@ -3,82 +3,87 @@ using System.IO;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Linq;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.Shell;
+using Newtonsoft.Json.Linq;
+using Microsoft.VisualStudio.OLE.Interop;
 
 namespace RunCommandOnSave
 {
     public class Settings
     {
-        public Settings(string docFullName)
+        public bool Debug;
+        public class Preset
         {
-            _settingsFilename = LocateSettings(Path.GetDirectoryName(docFullName));
+            public string[] Commands { get; set; }
+            public string[] ExcludeExtensions { get; set; }
+            public string[] ExcludePaths { get; set; }
         }
+        public Dictionary<SaveEventType, Dictionary<string, Preset>> EventsConfig = new Dictionary<SaveEventType, Dictionary<string, Preset>>();
 
-        public string ReadKey(string section, string key)
+        public Settings(string settingsFilename)
         {
-            var Temp = new StringBuilder(256);
-            var NumberOfChars = GetPrivateProfileString(section, key, null, Temp, Temp.Capacity, _settingsFilename);
-            return NumberOfChars == 0 ? null : Temp.ToString();
-        }
+            _iniReader = new IniFileReader(settingsFilename);
 
-        public string[] GetCommand(string docFullName, string action)
-        {
-            var CommandsRaw = ReadKey(action, "Commands");
-            if (CommandsRaw == null)
-            {
-                return null;
-            }
-            var Commands = CommandsRaw.Split(new char[] { '|' }, System.StringSplitOptions.RemoveEmptyEntries);
-            if (Commands.Length == 0)
-            {
-                return null;
-            }
+            // Check if the debug is active
 
-            // Check excluded paths (They can be relative or absolute separated by |)
+            Debug = _iniReader.Sections.ContainsKey("Debug") ? (_iniReader.Sections["Debug"].ContainsKey("On") ? Boolean.Parse(_iniReader.Sections["Debug"]["On"]) : false) : false;
 
-            var ExcludedPathsRaw = ReadKey(action, "ExcludePaths");
-            if (ExcludedPathsRaw != null)
+            // Generate our dictionary
+
+            foreach (var section in _iniReader.Sections)
             {
-                var BasePath = Path.GetDirectoryName(_settingsFilename);
-                var ExcludedPathsRawList = ExcludedPathsRaw.Split(new char[] { '|' }, System.StringSplitOptions.RemoveEmptyEntries);
-                var ExcludedPaths = ExcludedPathsRawList.Select(s => new FileInfo(Path.Combine(BasePath, s.Replace("/", "\\").Replace("\"", ""))).FullName);
-                try
+                var eventType = SaveEventType.Unknown;
+                var isPure = section.Key == "PreSave" || section.Key == "PostSave";
+
+                if (section.Key.StartsWith("PreSave"))
                 {
-                    foreach (var Path in ExcludedPaths)
+                    eventType = SaveEventType.PreSave;
+                }
+                else if (section.Key.StartsWith("PostSave"))
+                {
+                    eventType = SaveEventType.PostSave;
+                }
+
+                if (eventType == SaveEventType.Unknown)
+                {
+                    continue;
+                }
+
+                Preset preset = new Preset();
+                if (section.Value.ContainsKey("Commands"))
+                {
+                    preset.Commands = section.Value["Commands"].Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
+                }
+                if (section.Value.ContainsKey("ExcludeExtensions"))
+                {
+                    preset.ExcludeExtensions = section.Value["ExcludeExtensions"].Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
+                }
+                if (section.Value.ContainsKey("ExcludePaths"))
+                {
+                    preset.ExcludePaths = section.Value["ExcludePaths"].Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
+                }
+
+                if (!EventsConfig.ContainsKey(eventType))
+                {
+                    EventsConfig[eventType] = new Dictionary<string, Preset>();
+                }
+
+                if (isPure)
+                {
+                    EventsConfig[eventType]["*"] = preset;
+                }
+                else
+                {
+                    var dotIndex = section.Key.IndexOf('.');
+                    string extensions = section.Key.Substring(dotIndex + 1);
+                    foreach (var ext in extensions.Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries))
                     {
-                        if (docFullName.StartsWith(Path))
-                        {
-                            return null;
-                        }
+                        EventsConfig[eventType][ext] = preset;
                     }
                 }
-                catch (Exception)
-                {
-                }
             }
 
-            // Check excluded extensions (Separated by |)
-
-            var ExcludedExtensionsRaw = ReadKey(action, "ExcludeExtensions");
-            if (ExcludedExtensionsRaw != null)
-            {
-                var ExcludedExtensions = ExcludedExtensionsRaw.Split(new char[] { '|' }, System.StringSplitOptions.RemoveEmptyEntries).Select(s => s.TrimSuffix("*"));
-                try
-                {
-                    foreach (var Ext in ExcludedExtensions)
-                    {
-                        if (docFullName.EndsWith(Ext))
-                        {
-                            return null;
-                        }
-                    }
-                }
-                catch (Exception)
-                {
-                }
-            }
-
-            return Commands;
         }
 
         /*
@@ -87,26 +92,7 @@ namespace RunCommandOnSave
             ===============
         */
 
-        private string _settingsFilename = null;
+        private IniFileReader _iniReader;
 
-        private string LocateSettings(string startingPath)
-        {
-            var cfgFile = new FileInfo(Path.Combine(startingPath, ".runcommandonsave"));
-            var dir = new DirectoryInfo(startingPath);
-            while (!cfgFile.Exists && dir.Parent != null)
-            {
-                var configs = dir.GetFiles(".runcommandonsave");
-                if (configs.Length > 0)
-                {
-                    cfgFile = configs[0];
-                    break;
-                }
-                dir = dir.Parent;
-            }
-            return cfgFile.Exists ? cfgFile.FullName : null;
-        }
-
-        [DllImport("kernel32")]
-        private static extern int GetPrivateProfileString(string section, string key, string def, StringBuilder retVal, int size, string filePath);
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Collections.Generic;
 using EnvDTE;
 using EnvDTE80;
@@ -15,17 +15,19 @@ namespace RunCommandOnSave
         private readonly DTE _dte;
         private readonly RunningDocumentTable _runningDocumentTable;
         private OutputWindowPane _pane;
+        private SettingsCache _settingsCache;
 
         public Events(DTE dte, RunningDocumentTable runningDocumentTable)
         {
             _runningDocumentTable = runningDocumentTable;
             _dte = dte;
+            _settingsCache = new SettingsCache();
         }
 
         public int OnBeforeSave(uint docCookie)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
-            Process(docCookie, "PreSave");
+            Process(CookieToDoc(docCookie, _dte.Documents.Cast<Document>()), SaveEventType.PreSave);
             return VSConstants.S_OK;
 
         }
@@ -33,7 +35,7 @@ namespace RunCommandOnSave
         public int OnAfterSave(uint docCookie)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
-            Process(docCookie, "PostSave");
+            Process(CookieToDoc(docCookie, _dte.Documents.Cast<Document>()), SaveEventType.PostSave);
             return VSConstants.S_OK;
         }
 
@@ -53,59 +55,79 @@ namespace RunCommandOnSave
             =======
         */
 
-        private void Process(uint docCookie, string section)
+        private void Process(Document documentToFormat, SaveEventType eventType)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
-            var Documents = _dte.Documents.Cast<Document>();
-            var DocumentToFormat = CookieToDoc(docCookie, Documents);
-            if (DocumentToFormat != null)
+
+            if (documentToFormat != null)
             {
-                var FileSettings = new Settings(DocumentToFormat.FullName);
-                var Commands = FileSettings.GetCommand(DocumentToFormat.FullName, section);
-                var NumErrors = 0;
-                if (Commands != null && _dte.ActiveWindow.Kind == "Document")
+                // locate the settings for this document
+
+                var fileSettings = _settingsCache.GetSettingsForDocument(documentToFormat);
+                var ext = Path.GetExtension(documentToFormat.FullName).Substring(1);
+                string[] commands = null;
+                string err = "";
+
+                if (fileSettings.EventsConfig.ContainsKey(eventType))
                 {
-                    var ActiveDocument = _dte.ActiveDocument;
-                    DocumentToFormat.Activate();
-                    foreach (string Cmd in Commands)
+                    if (!fileSettings.EventsConfig[eventType].ContainsKey(ext))
+                    {
+                        ext = "*";
+                    }
+
+                    if (fileSettings.EventsConfig[eventType].ContainsKey(ext))
+                    {
+                        commands = fileSettings.EventsConfig[eventType][ext].Commands;
+                    }
+                }
+
+                var numErrors = 0;
+                if (commands != null && _dte.ActiveWindow.Kind == "Document")
+                {
+                    var activeDocument = _dte.ActiveDocument;
+                    documentToFormat.Activate();
+                    foreach (string cmd in commands)
                     {
                         try
                         {
-                            _dte.ExecuteCommand(Cmd, string.Empty);
+                            _dte.ExecuteCommand(cmd, string.Empty);
                         }
-                        catch (Exception)
+                        catch (Exception e)
                         {
-                            NumErrors += 1;
+                            numErrors += 1;
+                            err = e.Message;
                         }
                     }
-                    ActiveDocument.Activate();
+                    activeDocument.Activate();
                 }
 
-                var Debug = FileSettings.ReadKey("Debug", "On");
-                if (Debug != null && Debug.Equals("True", StringComparison.OrdinalIgnoreCase))
+                if (fileSettings.Debug)
                 {
-                    if (Commands == null || Commands.Length == 0 || NumErrors > 0)
+                    if (commands == null || commands.Length == 0 || numErrors > 0)
                     {
-                        Log(String.Format("{0}: RunCommandOnSave/{1} was NOT processed\n", DocumentToFormat.FullName, section));
+                        Log(String.Format("{0}: RunCommandOnSave/{1} was NOT processed ({2})\n", documentToFormat.FullName, eventType.ToString(), err));
                     }
                     else
                     {
-                        Log(String.Format("{0}: RunCommandOnSave/{1} WAS processed\n", DocumentToFormat.FullName, section));
+                        Log(String.Format("{0}: RunCommandOnSave/{1} WAS processed\n", documentToFormat.FullName, eventType.ToString()));
                     }
                 }
             }
         }
 
+        // debug logging
+
         private void Log(string message)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
             var dte2 = _dte as DTE2;
+            var paneName = "Run Command On Save - " + VersionInfo.Version;
             if (dte2 != null)
             {
                 var panes = dte2.ToolWindows.OutputWindow.OutputWindowPanes;
                 try
                 {
-                   _pane = panes.Item("Run Command On Save");
+                    _pane = panes.Item(paneName);
                 }
                 catch (ArgumentException)
                 {
@@ -113,15 +135,17 @@ namespace RunCommandOnSave
 
                 if (_pane == null)
                 {
-                    _pane = panes.Add("Run Command On Save");
+                    _pane = panes.Add(paneName);
                 }
 
                 if (_pane != null)
                 {
                     _pane.OutputString(message);
                 }
-            }            
+            }
         }
+
+        // doc cookie to document conversion
 
         private Document CookieToDoc(uint docCookie, IEnumerable<Document> documents)
         {

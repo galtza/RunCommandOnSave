@@ -26,6 +26,9 @@
 *.a
 *.lib
 
+# Log
+UpgradeLog.htm
+
 # Executables
 *.exe
 *.out

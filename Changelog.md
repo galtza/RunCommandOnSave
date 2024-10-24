@@ -1,5 +1,10 @@
 # Changelog
 
+## [v1.1.1] - 2024-10-24
+
+### Fixed
+- Fixed an issue that was making the binary downloaded from the marketplace to be the old binary
+
 ## [v1.1.0] - 2024-10-18
 
 ### Added

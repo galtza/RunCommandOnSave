@@ -64,6 +64,16 @@ namespace RunCommandOnSave
                 // locate the settings for this document
 
                 var fileSettings = _settingsCache.GetSettingsForDocument(documentToFormat);
+
+                // Check if we can proceed
+
+                if (!fileSettings.ShouldProceed(eventType, documentToFormat.FullName))
+                {
+                    return;
+                }
+
+                // Grab the corresponding commands
+
                 var ext = Path.GetExtension(documentToFormat.FullName).Substring(1);
                 string[] commands = null;
                 string err = "";

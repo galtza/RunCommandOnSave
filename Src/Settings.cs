@@ -23,6 +23,7 @@ namespace RunCommandOnSave
 
         public Settings(string settingsFilename)
         {
+            _settingsFilePath = settingsFilename;
             _iniReader = new IniFileReader(settingsFilename);
 
             // Check if the debug is active
@@ -86,6 +87,42 @@ namespace RunCommandOnSave
 
         }
 
+        public bool ShouldProceed(SaveEventType eventType, string path)
+        {
+            if (!EventsConfig.ContainsKey(eventType) || !EventsConfig[eventType].ContainsKey("*"))
+            {
+                return false;
+            }
+
+            var preset = EventsConfig[eventType]["*"];
+            var basePath = Path.GetDirectoryName(_settingsFilePath);
+            if (preset.ExcludePaths != null)
+            {
+                foreach (var excludedPath in preset.ExcludePaths)
+                {
+                    var fullExcludedPath = Path.GetFullPath(Path.Combine(basePath, excludedPath.Replace("/", "\\").Replace("\"", "")));
+                    if (path.StartsWith(fullExcludedPath, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            if (preset.ExcludeExtensions != null)
+            {
+                var fileExtension = Path.GetExtension(path);
+                foreach (var excludedExt in preset.ExcludeExtensions)
+                {
+                    if (fileExtension.Equals(excludedExt, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
         /*
             ===============
             Private Stuff
@@ -93,6 +130,7 @@ namespace RunCommandOnSave
         */
 
         private IniFileReader _iniReader;
+        private readonly string _settingsFilePath;
 
     }
 }

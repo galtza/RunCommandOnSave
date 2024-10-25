@@ -1,5 +1,10 @@
 # Changelog
 
+## [v1.1.2] - 2024-10-26
+
+### Fixed
+- Fixed an issue with exclusion paths and extensions
+
 ## [v1.1.1] - 2024-10-24
 
 ### Fixed

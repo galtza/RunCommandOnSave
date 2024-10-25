@@ -9,6 +9,6 @@
 
     public static class VersionInfo
     {
-        public const string Version = "v1.1.1";
+        public const string Version = "v1.1.2";
     }
 }

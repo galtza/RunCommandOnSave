@@ -1,4 +1,4 @@
-﻿# RunCommandOnSave (v1.1.1)
+﻿# RunCommandOnSave (v1.1.2)
 
 This Visual Studio Extension (VSIX) lets you run commands when you save files (before and after saving).
 
